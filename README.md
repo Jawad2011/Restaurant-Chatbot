@@ -48,7 +48,7 @@ the nodes I used here:
 
 11. Give your chat ID.
 
-12. Select this <img width="38" height="37" alt="Image" src="https://github.com/user-attachments/assets/b5eecd8e-a645-45b4-a8b2-70eec86ec102" /> beside the text.
+12. Select this <img width="38" height="37" alt="Image" src="https://github.com/user-attachments/assets/b5eecd8e-a645-45b4-a8b2-70eec86ec102" /> in the "Text" box.
 
 13. Now return to the "AI Agent" and choose "System Message" from options.
 
