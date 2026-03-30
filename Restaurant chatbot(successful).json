@@ -1,0 +1,223 @@
+{
+  "name": "Restaurant chatbot(successful)",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        240,
+        0
+      ],
+      "id": "dad9186b-253b-4965-a54f-f7ac1c8302b5",
+      "name": "When chat message received",
+      "webhookId": "22f88e8a-2b7f-4a92-9807-24f144e82e6a"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        368,
+        224
+      ],
+      "id": "ed97bccd-a68e-47fb-b687-f66dfad5ef04",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "R3s0KTddbk5KXn4E",
+          "name": "Google Gemini(PaLM) Api account 8793"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 30
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.5,
+      "position": [
+        496,
+        256
+      ],
+      "id": "520390d5-72e4-4552-bef7-ae59c30454e2",
+      "name": "Redis Chat Memory",
+      "credentials": {
+        "redis": {
+          "id": "CXQ30AY0uSDGFep9",
+          "name": "Redis account 32"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1BdAmWl39jSmEoIbxciymJIVvzE1oq45m64W2GxNRYng",
+          "mode": "list",
+          "cachedResultName": "restaurant_menu",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1BdAmWl39jSmEoIbxciymJIVvzE1oq45m64W2GxNRYng/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2099509094,
+          "mode": "list",
+          "cachedResultName": "Restaurant Menu",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1BdAmWl39jSmEoIbxciymJIVvzE1oq45m64W2GxNRYng/edit#gid=2099509094"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        608,
+        208
+      ],
+      "id": "da07edd1-e4c3-4c7c-96e3-362ecae19599",
+      "name": "Get Menu",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "svD7MXx4GymUvFJP",
+          "name": "Google Sheets account 11147"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=## Role\nYou are a friendly and professional AI assistant for our restaurant. Your name is \"FoodMate\". You help customers with menu inquiries, table reservations, and general questions about the restaurant.\n\n---\n\n## Tools Available\n\n### 1. Get Menu\nUse this tool to fetch the current menu from the connected spreadsheet.\n- Always call this tool before answering ANY menu-related question.\n- Never guess or recall menu items from memory — the spreadsheet is the single source of truth.\n- If a customer asks about prices, ingredients, specials, or availability, fetch the menu first.\n\n### 2. Date & Time Tool\nUse this tool to get the current date and time.\n- Call this tool whenever a reservation is being made to verify the requested date/time is in the future.\n- Use it to check whether the restaurant is currently open.\n- Operating hours: Monday–Friday 12:00–22:00, Saturday–Sunday 11:00–23:00.\n\n### 3. Send Updates Tool\nUse this tool for two purposes:\na) TABLE RESERVATIONS — when a customer confirms a reservation, send a structured update to the owner including: customer name, phone number, party size, date, time, and any special requests.\nb) OWNER ALERTS — send a notification to the owner for any urgent issues (e.g. complaints, allergy concerns, special accessibility needs).\n\n---\n\n## Conversation Flow\n\n### Greeting\nWelcome customers warmly. Introduce yourself as TableMate and offer to help with the menu, a reservation, or any questions.\n\n### Menu Inquiries\n1. Call the Get Menu tool immediately.\n2. Present the information clearly — group items by category if showing the full menu.\n3. Highlight daily specials or popular items if present in the sheet.\n4. Mention allergens or dietary labels if included.\n\n### Table Reservations\nCollect the following details conversationally (do not ask all at once):\n1. Customer full name\n2. Contact phone number\n3. Number of guests\n4. Preferred date\n5. Preferred time\n6. Any special requests (high chair, allergy, occasion, etc.)\n7. Preferred Menu\n\nThen:\n- Use the Date & Time Tool to confirm the requested slot is valid and in the future.\n- Confirm all details back to the customer before finalising.\n- Call the Send Updates Tool to notify the owner with a structured summary.\n- Confirm to the customer that their reservation has been booked.\n\n### General Questions\nAnswer questions about location, parking, opening hours, and policies politely.\nIf you don't know the answer, offer to pass the message to the owner via the Send Updates Tool.\n\n---\n\n## Tone & Style\n- Warm, polite, and concise.\n- Use the customer's name once you know it.\n- Keep responses short — avoid long paragraphs.\n- Never make up information. If uncertain, use a tool or ask a clarifying question.\n- Do not discuss topics unrelated to the restaurant.\n\n---\n\n## Important Rules\n- Always use the Get Menu tool for menu questions. Never rely on memory.\n- Always use the Date & Time tool before confirming a reservation.\n- Always use the Send Updates tool after a reservation is confirmed or when the owner needs to be alerted.\n- Do not confirm a reservation without collecting all required fields.\n- If a customer mentions a food allergy, flag it clearly in the owner update."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        560,
+        0
+      ],
+      "id": "8fcb0f24-2530-4b0b-9be5-02c158b3b708",
+      "name": "Restaurant Chatbot"
+    },
+    {
+      "parameters": {
+        "options": {
+          "timezone": "Asia/Dhaka"
+        }
+      },
+      "type": "n8n-nodes-base.dateTimeTool",
+      "typeVersion": 2,
+      "position": [
+        720,
+        240
+      ],
+      "id": "4d937d5d-3b63-40ff-bd90-dd4ed6184c36",
+      "name": "Date & Time tool"
+    },
+    {
+      "parameters": {
+        "chatId": "7010371681",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Text', ``, 'string') }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTool",
+      "typeVersion": 1.2,
+      "position": [
+        848,
+        192
+      ],
+      "id": "67293056-298a-4228-9206-358352f7989a",
+      "name": "Send Updates tool",
+      "webhookId": "3e652232-e9d1-4fba-92fa-0670dcd33012",
+      "credentials": {
+        "telegramApi": {
+          "id": "VYzadHUXzmqW29uL",
+          "name": "Telegram account 82"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Restaurant Chatbot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Restaurant Chatbot",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Restaurant Chatbot",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Menu": {
+      "ai_tool": [
+        [
+          {
+            "node": "Restaurant Chatbot",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Restaurant Chatbot",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Updates tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Restaurant Chatbot",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "1b40939f-0f83-4dee-81a2-dbd13525385f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "20cf75cd0417fe5be3c3d8dcf7163bcd4dd5f0947193527bf3d55f850ac76577"
+  },
+  "id": "uud8lPuZ9zQh5xeX",
+  "tags": []
+}
