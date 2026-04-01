@@ -1,62 +1,92 @@
-# Restaurant-Chatbot
+# 🤖 FoodMate — AI Restaurant Chatbot (n8n)
 
-Hello, all this is Jawad. I have built a practical AI chatbot for restaurant. I named it "Foodmate". It is a beginner level project. You can build it too using n8n. 
+> A no-code AI chatbot built with n8n that handles customer questions, shares your menu, takes table reservations, and pings you on Telegram — all automatically.
 
-It can do:
-- It can answer the questions of customers
-- It can provide menu and answer menu-related queries
-- It can reserve tables
-- It can send updates to its owner using telegram(You may use whatsapp or others also)
+![n8n workflow](https://img.shields.io/badge/n8n-workflow-orange)
+![AI chatbot](https://img.shields.io/badge/AI-chatbot-blue)
+![beginner friendly](https://img.shields.io/badge/beginner-friendly-green)
+![restaurant automation](https://img.shields.io/badge/restaurant-automation-purple)
 
-<img width="1118" height="527" alt="restaurant chatbot" src="https://github.com/user-attachments/assets/ef8afe68-617f-422b-b946-df77dce85e8d" />
+---
 
-the nodes I used here:
-1) When Chat Message received
-2) AI Agent:
-   - Gemini Chat model [Note: You may use other chat models also]
-   - Redis Chat Memory [Note: You may also use Postgres, MongoDB or Xata but I used Redis because of its speed]
-   - Google sheets tool(Get rows)
-   - Date & Time
-   - Telegram Tool(Send a text message) [Note: You can use other platforms also like whatsapp etc]
-  
+## ✨ What FoodMate Can Do
 
+| Feature | Description |
+|---|---|
+| 💬 **Answer questions** | Responds to common customer queries about hours, location, and policies |
+| 🍽️ **Share the menu** | Fetches live menu data from Google Sheets and answers price, ingredient, and availability queries |
+| 📅 **Reserve tables** | Collects guest details conversationally and confirms bookings in real time |
+| 📲 **Notify the owner** | Sends reservation summaries and urgent alerts via Telegram (or WhatsApp, etc.) |
 
-### Now, let's dive into how to build it 
+---
 
+## 🛠️ Tech Stack
 
-1. Take the "When Chat Message received" node
+| Tool | Role | Notes |
+|---|---|---|
+| **n8n** | Workflow automation | Self-hosted or cloud |
+| **Gemini / any LLM** | AI chat model | GPT-4, Claude, etc. all work |
+| **Redis** | Chat memory | Recommended for speed; Postgres, MongoDB, Xata also work |
+| **Google Sheets** | Live menu data | Upload your menu to Google Drive first |
+| **Telegram** | Owner notifications | Can be swapped for WhatsApp or any messaging platform |
 
-2. Then take the "AI Agent" node
+---
 
-3. Select any model. I chose Gemini in this bot.
+## 🔧 n8n Nodes Used
 
-4. Select any memory among Postgres, Redis, MongoDB or Xata though I recommend to use Redis because its speed is quite good.
+1. `When Chat Message Received`
+2. `AI Agent`
+   - Gemini Chat Model *(or any LLM)*
+   - Redis Chat Memory *(or Postgres / MongoDB / Xata)*
+   - Google Sheets Tool — `Get Row(s)` operation
+   - Date & Time Tool
+   - Telegram Tool — `Send Message` operation
 
-5. Select the Google sheet tool and choose operation as Get Row(s)
+---
 
-6. Then, choose the sheet where the menu is. If it is not uploaded in Google Drive, you have to upload it first.
+## 🚀 Step-by-Step Build Guide
 
-7. Now, select another tool named  "Date & Time".
+### Step 1 — Add the trigger node
+In n8n, add a **When Chat Message Received** node as your entry point.
 
-8. Go inside the settings of "Date & Time" and choose option then Timezone. Here you have to upload the time zone using this format: ``` Continent/City ```
+### Step 2 — Add an AI Agent node
+Connect an **AI Agent** node to the trigger. This is the brain of your chatbot.
 
-   for Example: Europe/London
+### Step 3 — Choose a chat model
+Select any model — Gemini, GPT-4, Claude, etc. Gemini works well and has a free tier.
 
-9. Now choose another node named "Telegram tool" and choose operation as send messages.
+### Step 4 — Set up chat memory
+Add **Redis Chat Memory** so the bot remembers previous messages in the same conversation.
 
-10. In the "Telegram tool" node you have to choose a telegram bot added in your n8n.
+### Step 5 — Connect Google Sheets (menu)
+Add a **Google Sheets** tool, set the operation to **Get Row(s)**, and link your menu spreadsheet. Upload it to Google Drive first if needed.
 
-11. Give your chat ID.
+> 📌 Need help with Google Sheets credentials? [Check out this guide →](https://github.com/Jawad2011/How-to-get-Google-credential-for-n8n)
 
-12. Select this <img width="38" height="37" alt="Image" src="https://github.com/user-attachments/assets/b5eecd8e-a645-45b4-a8b2-70eec86ec102" /> in the "Text" box.
+### Step 6 — Add Date & Time
+Add the **Date & Time** node. In settings, set the timezone using the format `Continent/City`.
 
-13. Now return to the "AI Agent" and choose "System Message" from options.
+```
+Example: Asia/Dhaka
+```
 
-14. Paste this text into the system message.
+### Step 7 — Add Telegram notifications
+Add a **Telegram Tool**, choose **Send Message**, connect your bot, and paste in your Chat ID.
+
+### Step 8 — Paste the system prompt
+Go back to the AI Agent node, open **System Message**, and paste the prompt below.
+
+---
+
+## 🧠 System Prompt
+
+Paste this into **AI Agent → System Message**:
 
 ```
 ## Role
-You are a friendly and professional AI assistant for our restaurant. Your name is "FoodMate". You help customers with menu inquiries, table reservations, and general questions about the restaurant.
+You are a friendly and professional AI assistant for our restaurant.
+Your name is "FoodMate". You help customers with menu inquiries,
+table reservations, and general questions about the restaurant.
 
 ---
 
@@ -66,83 +96,62 @@ You are a friendly and professional AI assistant for our restaurant. Your name i
 Use this tool to fetch the current menu from the connected spreadsheet.
 - Always call this tool before answering ANY menu-related question.
 - Never guess or recall menu items from memory — the spreadsheet is the single source of truth.
-- If a customer asks about prices, ingredients, specials, or availability, fetch the menu first.
 
 ### 2. Date & Time Tool
 Use this tool to get the current date and time.
-- Call this tool whenever a reservation is being made to verify the requested date/time is in the future.
-- Use it to check whether the restaurant is currently open.
+- Call before confirming any reservation to verify the date/time is in the future.
 - Operating hours: Monday–Friday 12:00–22:00, Saturday–Sunday 11:00–23:00.
 
 ### 3. Send Updates Tool
-Use this tool for two purposes:
-a) TABLE RESERVATIONS — when a customer confirms a reservation, send a structured update to the owner including: customer name, phone number, party size, date, time, and any special requests.
-b) OWNER ALERTS — send a notification to the owner for any urgent issues (e.g. complaints, allergy concerns, special accessibility needs).
+Use this tool for:
+a) TABLE RESERVATIONS — send structured update to owner: name, phone, party size, date, time, special requests.
+b) OWNER ALERTS — notify for urgent issues (complaints, allergies, accessibility needs).
 
 ---
 
-## Conversation Flow
-
-### Greeting
-Welcome customers warmly. Introduce yourself as TableMate and offer to help with the menu, a reservation, or any questions.
-
-### Menu Inquiries
-1. Call the Get Menu tool immediately.
-2. Present the information clearly — group items by category if showing the full menu.
-3. Highlight daily specials or popular items if present in the sheet.
-4. Mention allergens or dietary labels if included.
-
-### Table Reservations
-Collect the following details conversationally (do not ask all at once):
+## Reservation Flow
+Collect these details conversationally (do not ask all at once):
 1. Customer full name
 2. Contact phone number
 3. Number of guests
 4. Preferred date
 5. Preferred time
-6. Any special requests (high chair, allergy, occasion, etc.)
-7. Preferred Menu
+6. Special requests
+7. Preferred menu items
 
-Then:
-- Use the Date & Time Tool to confirm the requested slot is valid and in the future.
-- Confirm all details back to the customer before finalising.
-- Call the Send Updates Tool to notify the owner with a structured summary.
-- Confirm to the customer that their reservation has been booked.
-
-### General Questions
-Answer questions about location, parking, opening hours, and policies politely.
-If you don't know the answer, offer to pass the message to the owner via the Send Updates Tool.
+Then confirm details → use Date & Time tool → call Send Updates tool → confirm booking to customer.
 
 ---
 
-## Tone & Style
-- Warm, polite, and concise.
-- Use the customer's name once you know it.
-- Keep responses short — avoid long paragraphs.
-- Never make up information. If uncertain, use a tool or ask a clarifying question.
-- Do not discuss topics unrelated to the restaurant.
-
----
-
-## Important Rules
-- Always use the Get Menu tool for menu questions. Never rely on memory.
-- Always use the Date & Time tool before confirming a reservation.
-- Always use the Send Updates tool after a reservation is confirmed or when the owner needs to be alerted.
-- Do not confirm a reservation without collecting all required fields.
-- If a customer mentions a food allergy, flag it clearly in the owner update.
+## Rules
+- Never guess menu items — always fetch from the sheet
+- Never confirm a reservation without all required fields
+- Flag food allergies clearly in the owner update
+- Keep responses warm, short, and personal (use the customer's name once you know it)
+- Do not discuss topics unrelated to the restaurant
 ```
 
+---
 
+## 💡 Pro Tip
 
-## Now your Chatbot is ready to be deployed ##
+> **Name your nodes descriptively** — e.g. *"Get Menu from Sheets"*, *"Send Telegram Alert"*.
+> The AI Agent uses node names to decide which tool to call. Clearer names = smarter routing.
 
+---
 
-### A pro tip: name your nodes according to their functions. It will make the workflow smoother because the AI Agent now specificllly know which node it has to use to give which output ###
+## 📥 Quick Start
 
+You can **download the workflow JSON** and import it directly into n8n to get started instantly without building from scratch.
 
-If you don't know how to add Google sheets credential be sure to [check out this repository](https://github.com/Jawad2011/How-to-get-Google-credential-for-n8n)
+---
 
+## 🙋 Questions & Support
 
-## You can download the json file and paste it into n8n to use it.
+Got a question? Open a [GitHub Discussion](../../discussions) and I'll help out.
 
+If this project helped you, please give it a ⭐ — it helps others find it!
 
-If you have any question, just ask on discussions. I tried to simplify this process as much as I can. If this guide helped you, please give it a ⭐ to help others find it!
+---
+
+*Built by [Jawad](https://github.com/Jawad2011) · Beginner-level n8n project · Open source*
